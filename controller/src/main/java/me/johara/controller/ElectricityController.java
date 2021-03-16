@@ -12,7 +12,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 @Path("/impressions")
-public class ImpressionsController {
+public class ElectricityController {
 
     @Inject
     @Channel("watts")
