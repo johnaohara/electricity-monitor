@@ -30,8 +30,10 @@ public abstract class AbstractGpioMonitor implements Runnable{
     String trigger;
 
 
-    public abstract void eventCallback(GpioPinDigitalStateChangeEvent event);
+//    public abstract void eventCallback(GpioPinDigitalStateChangeEvent event);
 
+
+    abstract GpioPinListenerDigital getListener();
     public abstract void startCallback();
     public abstract void endCallback();
 
@@ -52,14 +54,12 @@ public abstract class AbstractGpioMonitor implements Runnable{
             } else {
 
                 logger.infof("Configuring GPIO pin #%s", GPIO_PIN.getName());
-                pin = gpio.provisionDigitalInputPin(GPIO_PIN, PinPullResistance.PULL_DOWN);
+                pin = gpio.provisionDigitalInputPin(GPIO_PIN);
                 pin.setShutdownOptions(true);
                 pin.setDebounce(debounce);
 
                 // create and register gpio pin listener
-                pin.addListener((GpioPinListenerDigital) event -> {
-                    eventCallback(event);
-                });
+                pin.addListener(getListener());
 
                 startCallback();
 

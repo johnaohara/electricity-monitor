@@ -44,10 +44,10 @@
       <artifactId>pi4j-core</artifactId>
       <version>${pi4j.version}</version>
     </dependency>
-<!--    <dependency>-->
-<!--      <groupId>io.quarkus</groupId>-->
-<!--      <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>-->
-<!--    </dependency>-->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
+    </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-junit5</artifactId>
