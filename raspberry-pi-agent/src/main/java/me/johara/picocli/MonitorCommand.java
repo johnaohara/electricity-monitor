@@ -1,6 +1,8 @@
 package me.johara.picocli;
 
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
+import me.johara.picocli.monitor.AbstractMonitor;
+import me.johara.picocli.monitor.ElectricityMonitor;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.jboss.logging.Logger;
@@ -14,31 +16,16 @@ public class MonitorCommand extends AbstractGpioMonitor {
 
     static Logger logger = Logger.getLogger(MonitorCommand.class);
 
-//    @CommandLine.Option(names = {"--broadcast"}, description = "Broadcast events to Kafka topic", defaultValue = "true")
-//    boolean broadcast;
-
-
-    @Inject
-    @Channel("impression")
-    Emitter<Long> impressionEmitter;
+    private final AbstractMonitor monitor;
 
     public MonitorCommand() {
-        logger.warn("Initialising MonitorCommand");
+        logger.info("Initialising MonitorCommand");
+        monitor = new ElectricityMonitor();
     }
 
     @Override
     GpioPinListenerDigital getListener() {
-        return event -> {
-            if (event.getState().getName().equals(trigger)) {
-                Long timestamp = System.currentTimeMillis();
-//                if (broadcast) {
-                    logger.infof("Sending Event: %ld", timestamp);
-                    impressionEmitter.send(timestamp);
-//                } else {
-//                    logger.debugf("Event NOT BROADCAST: %ld", timestamp);
-//                }
-            }
-        };
+        return monitor.getListener();
     }
 
     @Override
@@ -47,7 +34,7 @@ public class MonitorCommand extends AbstractGpioMonitor {
     }
 
     @Override
-    public void endCallback() {
+    public void stopCallback() {
         logger.info("Shutting down GPIO controller");
     }
 

@@ -34,7 +34,7 @@ public class DebugCommand extends AbstractGpioMonitor {
     }
 
 //    @Override
-    public void endCallback() {
+    public void stopCallback() {
         logger.info("Shutting down GPIO controller");
     }
 }

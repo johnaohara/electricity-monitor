@@ -35,7 +35,7 @@ public abstract class AbstractGpioMonitor implements Runnable{
 
     abstract GpioPinListenerDigital getListener();
     public abstract void startCallback();
-    public abstract void endCallback();
+    public abstract void stopCallback();
 
     @Override
     public void run() {
@@ -71,7 +71,7 @@ public abstract class AbstractGpioMonitor implements Runnable{
                     } catch (InterruptedException e) {
                         // stop all GPIO activity/threads by shutting down the GPIO controller
                         // (this method will forcefully shutdown all GPIO monitoring threads and scheduled tasks)
-                        endCallback();
+                        stopCallback();
                         gpio.shutdown();
                         Thread.currentThread().interrupt();
                     }
