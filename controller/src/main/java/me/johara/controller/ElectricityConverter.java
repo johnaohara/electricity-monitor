@@ -13,9 +13,9 @@ import javax.inject.Inject;
 import java.util.concurrent.atomic.AtomicLong;
 
 @ApplicationScoped
-public class ImpressionConverter {
+public class ElectricityConverter {
 
-    Logger logger = Logger.getLogger(ImpressionConverter.class);
+    Logger logger = Logger.getLogger(ElectricityConverter.class);
 
     public static final int V_RMS = 240;
     private long lastTimestamp = 0;
@@ -27,19 +27,19 @@ public class ImpressionConverter {
     private AtomicLong wattHours = new AtomicLong(0);
 
     @Inject
-    ImpressionConverter(MeterRegistry registry) {
+    ElectricityConverter(MeterRegistry registry) {
         this.registry = registry;
 
         registry.gauge("electricity.current.watts", this,
-                ImpressionConverter::currentWatts);
+                ElectricityConverter::currentWatts);
         registry.gauge("electricity.current.milliamps", this,
-                ImpressionConverter::currentAmps);
+                ElectricityConverter::currentAmps);
         registry.gauge("electricity.current.wattHours", this,
-                ImpressionConverter::currentWattHours);
+                ElectricityConverter::currentWattHours);
     }
 
 
-    @Incoming("impressions")
+    @Incoming("electricity")
     @Outgoing("watts")
     @Broadcast
     @Acknowledgment(Acknowledgment.Strategy.PRE_PROCESSING)
