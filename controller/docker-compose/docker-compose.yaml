@@ -62,7 +62,7 @@ services:
 
   quarkus-micrometer:
     container_name: electricity-monitor
-    image: johara/controller:1.0.0-SNAPSHOT
+    image: johara/controller:1.0.1.Final
     ports:
       - "8281:8080"
     depends_on:
