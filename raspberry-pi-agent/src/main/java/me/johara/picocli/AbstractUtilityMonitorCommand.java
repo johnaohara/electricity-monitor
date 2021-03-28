@@ -27,6 +27,7 @@ public abstract class AbstractUtilityMonitorCommand implements Runnable {
 
     public abstract void startCallback();
     public abstract void stopCallback();
+    public abstract void instantiateCallback();
 
     @Override
     public void run() {
@@ -34,7 +35,9 @@ public abstract class AbstractUtilityMonitorCommand implements Runnable {
         if (!Raspberry.isPi()) {
             logger.error("Can not initialise Pi4J.  Platform is not Raspberry Pi!");
         } else {
-            logger.infof("Initializing Monitor: %s", monitor.getName());
+            logger.infof("Initializing Monitor: %s", utility);
+
+            instantiateCallback();
 
             monitor.initialize();
 

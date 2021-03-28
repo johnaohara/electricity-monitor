@@ -39,9 +39,11 @@ public abstract class AbstractPinStateMonitor implements PinStateMonitor<Long> {
         return event -> {
             if (event.getState().getName().equals(trigger)) {
                 Long timestamp = System.currentTimeMillis();
-                logger.infof("Sending Event: %ld", timestamp);
+                logger.debugf("Sending Event: %ld", timestamp);
                 if (!debug) {
                     getEmitter().send(timestamp);
+                } else {
+                    logger.infof("Sending Event: %ld", timestamp);
                 }
             }
         };

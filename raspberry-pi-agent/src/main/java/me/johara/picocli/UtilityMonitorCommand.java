@@ -11,9 +11,12 @@ public class UtilityMonitorCommand extends AbstractUtilityMonitorCommand {
 
     public UtilityMonitorCommand() {
         logger.info("Initialising MonitorCommand");
-        monitor = MonitorFactory.buildMonitor(utility, pinName, debounce, trigger,false);
     }
 
+    @Override
+    public void instantiateCallback() {
+        monitor = MonitorFactory.buildMonitor(utility, pinName, debounce, trigger,false);
+    }
     @Override
     public void startCallback() {
         logger.info("Starting Monitoring");

@@ -11,6 +11,10 @@ public class DebugCommand extends AbstractUtilityMonitorCommand {
 
     public DebugCommand() {
         logger.warn("Initialising DebugCommand");
+    }
+
+    @Override
+    public void instantiateCallback() {
         monitor = MonitorFactory.buildMonitor(utility, pinName, debounce, trigger,true);
     }
 
