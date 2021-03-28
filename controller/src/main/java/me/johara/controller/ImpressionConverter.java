@@ -17,12 +17,14 @@ public class ImpressionConverter {
 
     Logger logger = Logger.getLogger(ImpressionConverter.class);
 
+    public static final int V_RMS = 240;
     private long lastTimestamp = 0;
 
     private final MeterRegistry registry;
 
-    private AtomicLong currentWatts = new AtomicLong(0);
-    private AtomicLong currentMilliAmps = new AtomicLong(0);
+    private AtomicLong watts = new AtomicLong(0);
+    private AtomicLong milliAmps = new AtomicLong(0);
+    private AtomicLong wattHours = new AtomicLong(0);
 
     @Inject
     ImpressionConverter(MeterRegistry registry) {
@@ -32,6 +34,8 @@ public class ImpressionConverter {
                 ImpressionConverter::currentWatts);
         registry.gauge("electricity.current.milliamps", this,
                 ImpressionConverter::currentAmps);
+        registry.gauge("electricity.current.wattHours", this,
+                ImpressionConverter::currentWattHours);
     }
 
 
@@ -46,6 +50,7 @@ public class ImpressionConverter {
             return null;
         }
 
+        wattHours.incrementAndGet();
         logger.debugf("Received timestamp: %s", timestamp);
 
         double diff = Double.valueOf(timestamp - lastTimestamp);
@@ -56,25 +61,30 @@ public class ImpressionConverter {
 
         double watts = 3_600_000 / diff ;
 
-        double amps = watts / 240;
+        double amps = watts / V_RMS;
 
         logger.debugf("Average Watts: %s", watts);
         logger.debugf("Average Amps: %s", amps);
 
-        currentWatts.set((long) watts);
-        currentMilliAmps.set((long) (amps * 1000));
+        this.watts.set((long) watts);
+        milliAmps.set((long) (amps * 1000));
 
-        return new ElectricityDTO(timestamp, watts, amps);
+        return new ElectricityDTO(timestamp, watts, amps, wattHours.get());
     }
 
 
     double currentWatts(){
-        return currentWatts.get();
+        return watts.get();
+    }
+
+    long currentWattHours(){
+        long curWattHours = wattHours.get();
+        wattHours.set(0);
+        return curWattHours;
     }
 
     double currentAmps(){
-//        return ((double)currentMilliAmps.get()) / 1000.0d;
-        return ((double)currentMilliAmps.get());
+        return ((double) milliAmps.get());
     }
 
 }
