@@ -61,7 +61,7 @@ services:
       - './target/logs/grafana:/var/log/grafana'
 
   quarkus-micrometer:
-    container_name: quarkus-micrometer
+    container_name: electricity-monitor
     image: johara/controller:1.0.0-SNAPSHOT
     ports:
       - "8281:8080"
