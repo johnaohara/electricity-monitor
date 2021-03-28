@@ -7,6 +7,7 @@ import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import me.johara.picocli.UtilityMonitorCommand;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.jboss.logging.Logger;
 
 public abstract class AbstractPinStateMonitor implements PinStateMonitor<Long> {
@@ -15,6 +16,7 @@ public abstract class AbstractPinStateMonitor implements PinStateMonitor<Long> {
 
     private GpioController gpio;
     private GpioPinDigitalInput pin;
+    private Emitter<Long> timestampEmitter;
 
     String trigger;
     String pinName;
@@ -24,11 +26,8 @@ public abstract class AbstractPinStateMonitor implements PinStateMonitor<Long> {
     public abstract String getName();
 
 
-    public AbstractPinStateMonitor() {
-    }
-
-    public AbstractPinStateMonitor(String pinName, int debounce, String trigger, boolean debug) {
-        this();
+    public AbstractPinStateMonitor(Emitter<Long> timestampEmitter, String pinName, int debounce, String trigger, boolean debug) {
+        this.timestampEmitter = timestampEmitter;
         this.pinName = pinName;
         this.debounce = debounce;
         this.trigger = trigger;
@@ -41,7 +40,7 @@ public abstract class AbstractPinStateMonitor implements PinStateMonitor<Long> {
                 Long timestamp = System.currentTimeMillis();
                 logger.debugf("Sending Event: %ld", timestamp);
                 if (!debug) {
-                    getEmitter().send(timestamp);
+                    timestampEmitter.send(timestamp);
                 } else {
                     logger.infof("Sending Event: %ld", timestamp);
                 }

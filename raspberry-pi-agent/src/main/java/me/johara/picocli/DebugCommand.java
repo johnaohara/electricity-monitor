@@ -4,10 +4,15 @@ import me.johara.picocli.util.MonitorFactory;
 import org.jboss.logging.Logger;
 import picocli.CommandLine.Command;
 
+import javax.inject.Inject;
+
 @Command(name = "debug")
 public class DebugCommand extends AbstractUtilityMonitorCommand {
 
     static Logger logger = Logger.getLogger(DebugCommand.class);
+
+    @Inject
+    MonitorFactory monitorFactory;
 
     public DebugCommand() {
         logger.warn("Initialising DebugCommand");
@@ -15,7 +20,7 @@ public class DebugCommand extends AbstractUtilityMonitorCommand {
 
     @Override
     public void instantiateCallback() {
-        monitor = MonitorFactory.buildMonitor(utility, pinName, debounce, trigger,true);
+        monitor = monitorFactory.buildMonitor(utility, pinName, debounce, trigger,true);
     }
 
     @Override
