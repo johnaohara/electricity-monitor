@@ -2,31 +2,30 @@ package me.johara.picocli.monitor;
 
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
-import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
 
-public class ElectricityMonitor extends AbstractMonitor {
-
-    Logger logger =  Logger.getLogger(ElectricityMonitor.class);
+public class ElectricityMonitor extends AbstractPinStateMonitor {
 
     @Inject
     @Channel("electricity")
     Emitter<Long> electricityTimestampEmitter;
 
+    public ElectricityMonitor() {
+    }
+
+    public ElectricityMonitor(String pinName, int debounce, String trigger, boolean debug) {
+        super(pinName, debounce, trigger, debug);
+    }
+
+    @Override
+    public String getName() {
+        return "electricity";
+    }
+
     @Override
     public Emitter getEmitter() {
         return electricityTimestampEmitter;
-    }
-
-    @Override
-    public void startCallback() {
-        logger.info("Starting electricity monitor");
-    }
-
-    @Override
-    public void stopCallback() {
-        logger.info("Stopping electricity monitor");
     }
 
 }

@@ -5,26 +5,28 @@ import org.eclipse.microprofile.reactive.messaging.Emitter;
 
 import javax.inject.Inject;
 
-public class WaterMonitor extends AbstractMonitor {
+public class WaterMonitor extends AbstractPinStateMonitor {
 
     @Inject
     @Channel("water")
-    Emitter<Long> impressionEmitter;
+    Emitter<Long> waterEmitter;
+
+    public WaterMonitor() {
+    }
+
+    public WaterMonitor(String pinName, int debounce, String trigger, boolean debug) {
+        super(pinName, debounce, trigger, debug);
+    }
+
+
+    @Override
+    public String getName() {
+        return "water";
+    }
 
     @Override
     public Emitter getEmitter() {
-        return impressionEmitter;
+        return waterEmitter;
     }
-
-    @Override
-    public void startCallback() {
-        logger.info("Starting water monitor");
-    }
-
-    @Override
-    public void stopCallback() {
-        logger.info("Stopping water monitor");
-    }
-
 
 }

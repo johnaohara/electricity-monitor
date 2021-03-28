@@ -1,40 +1,26 @@
 package me.johara.picocli;
 
-import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
-import com.pi4j.io.gpio.event.GpioPinListenerDigital;
+import me.johara.picocli.util.MonitorFactory;
 import org.jboss.logging.Logger;
 import picocli.CommandLine.Command;
 
 @Command(name = "debug")
-public class DebugCommand extends AbstractGpioMonitor {
+public class DebugCommand extends AbstractUtilityMonitorCommand {
 
     static Logger logger = Logger.getLogger(DebugCommand.class);
 
     public DebugCommand() {
         logger.warn("Initialising DebugCommand");
+        monitor = MonitorFactory.buildMonitor(utility, pinName, debounce, trigger,true);
     }
 
     @Override
-    GpioPinListenerDigital getListener(){
-        return event -> {
-            if (event.getState().getName().equals(trigger)) {
-                logger.info(" --> GPIO PIN STATE CHANGE: " + event.getPin() + " = " + event.getState());
-            }
-        };
-    }
-
-//    @Override
-    public void eventCallback(GpioPinDigitalStateChangeEvent event) {
-        logger.debug(" --> GPIO PIN STATE CHANGE: " + event.getPin() + " = " + event.getState());
-    }
-
-//    @Override
     public void startCallback() {
         logger.info("Starting DEBUG Monitoring");
     }
 
-//    @Override
+    @Override
     public void stopCallback() {
-        logger.info("Shutting down GPIO controller");
+        logger.info("Stopping DEBUG Monitoring");
     }
 }
