@@ -11,7 +11,7 @@ import org.jboss.logging.Logger;
 
 public abstract class AbstractPinStateMonitor implements PinStateMonitor<Long> {
 
-    private static Logger logger = Logger.getLogger(UtilityMonitorCommand.class);
+    protected static Logger logger = Logger.getLogger(UtilityMonitorCommand.class);
 
     private GpioController gpio;
     private GpioPinDigitalInput pin;

@@ -7,8 +7,8 @@ import javax.inject.Inject;
 
 public class WaterMonitor extends AbstractPinStateMonitor {
 
-    @Inject
-    @Channel("water")
+//    @Inject
+//    @Channel("water")
     Emitter<Long> waterEmitter;
 
     public WaterMonitor() {

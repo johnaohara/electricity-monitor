@@ -24,7 +24,7 @@
 </body>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script>
-    var source = new EventSource("/impressions/stream");
+    var source = new EventSource("/electricity/stream");
     source.onmessage = function (event) {
         var obj = JSON.parse(event.data);
         document.getElementById("timestamp").innerHTML = obj.timestamp;

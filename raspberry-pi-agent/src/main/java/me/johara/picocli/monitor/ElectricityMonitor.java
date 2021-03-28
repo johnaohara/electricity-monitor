@@ -25,6 +25,7 @@ public class ElectricityMonitor extends AbstractPinStateMonitor {
 
     @Override
     public Emitter getEmitter() {
+        logger.infof("Electricity emitter is null: %s\n", electricityTimestampEmitter == null);
         return electricityTimestampEmitter;
     }
 
