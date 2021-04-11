@@ -1,5 +1,6 @@
 package me.johara.picocli.util;
 
+import me.johara.picocli.dto.UtilityTimestamp;
 import me.johara.picocli.monitor.ElectricityMonitor;
 import me.johara.picocli.monitor.PinStateMonitor;
 import me.johara.picocli.monitor.WaterMonitor;
@@ -13,12 +14,12 @@ import javax.inject.Singleton;
 @Singleton
 public class MonitorFactory {
 
-    Emitter<Long> timestampEmitter;
+    Emitter<UtilityTimestamp> timestampEmitter;
 
     private static final Logger logger = Logger.getLogger(MonitorFactory.class);
 
     @Inject
-    public MonitorFactory(@Channel("electricity") Emitter<Long> timestampEmitter) {
+    public MonitorFactory(@Channel("utility") Emitter<UtilityTimestamp> timestampEmitter) {
         this.timestampEmitter = timestampEmitter;
     }
 

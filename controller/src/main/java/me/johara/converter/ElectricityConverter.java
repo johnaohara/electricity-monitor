@@ -1,34 +1,39 @@
-package me.johara.controller;
+package me.johara.converter;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.smallrye.reactive.messaging.annotations.Broadcast;
 import me.johara.dto.ElectricityDTO;
-import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
-import org.eclipse.microprofile.reactive.messaging.Incoming;
-import org.eclipse.microprofile.reactive.messaging.Outgoing;
+import me.johara.dto.UtilityTimestamp;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.jboss.logging.Logger;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.concurrent.atomic.AtomicLong;
 
-@ApplicationScoped
-public class ElectricityConverter {
+@Singleton
+public class ElectricityConverter implements UtilityConverter {
+
+    @Inject
+    @Channel("electricity")
+    @Broadcast
+    Emitter<ElectricityDTO> timestampEmitter;
 
     Logger logger = Logger.getLogger(ElectricityConverter.class);
 
     public static final int V_RMS = 240;
     private long lastTimestamp = 0;
 
-    private final MeterRegistry registry;
-
     private AtomicLong watts = new AtomicLong(0);
     private AtomicLong milliAmps = new AtomicLong(0);
     private AtomicLong wattHours = new AtomicLong(0);
 
-    @Inject
-    ElectricityConverter(MeterRegistry registry) {
-        this.registry = registry;
+    public ElectricityConverter() {
+    }
+
+    @Override
+    public void registerMetrics(MeterRegistry registry) {
 
         registry.gauge("electricity.current.watts", this,
                 ElectricityConverter::currentWatts);
@@ -38,26 +43,26 @@ public class ElectricityConverter {
                 ElectricityConverter::currentWattHours);
     }
 
+    @Override
+    public void process(UtilityTimestamp utilityTimestamp) {
 
-    @Incoming("electricity")
-    @Outgoing("watts")
-    @Broadcast
-    @Acknowledgment(Acknowledgment.Strategy.PRE_PROCESSING)
-    public ElectricityDTO process(long timestamp) {
+        Long curTimestamp = utilityTimestamp.getTimestamp();
+
+        logger.infof("Received timestamp: %s", curTimestamp);
 
         if(lastTimestamp == 0){
-            lastTimestamp = timestamp;
-            return null;
+            lastTimestamp = curTimestamp;
+            return;
         }
 
         wattHours.incrementAndGet();
-        logger.debugf("Received timestamp: %s", timestamp);
+        logger.debugf("Received timestamp: %s", curTimestamp);
 
-        double diff = Double.valueOf(timestamp - lastTimestamp);
+        double diff = Double.valueOf(curTimestamp - lastTimestamp);
 
         logger.debugf("Duration since previous timestamp: %s", diff);
 
-        lastTimestamp = timestamp;
+        lastTimestamp = curTimestamp;
 
         double watts = 3_600_000 / diff ;
 
@@ -69,7 +74,12 @@ public class ElectricityConverter {
         this.watts.set((long) watts);
         milliAmps.set((long) (amps * 1000));
 
-        return new ElectricityDTO(timestamp, watts, amps, wattHours.get());
+        timestampEmitter.send(new ElectricityDTO(curTimestamp, watts, amps, wattHours.get()));
+    }
+
+    @Override
+    public String getName() {
+        return "ELECTRICITY";
     }
 
 

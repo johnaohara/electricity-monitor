@@ -21,16 +21,34 @@
         <p class="col-md-12"><strong>Watt Hours: <span id="wattHours">N/A</span></strong></p>
     </div>
 </div>
+<div class="container">
+
+    <h1>Current Water Usage</h1>
+    <div class="row">
+        <p class="col-md-12">The average water usage in the last period was;</p>
+        <p class="col-md-12"><strong>Timestamp: <span id="water_timestamp">N/A</span></strong></p>
+        <p class="col-md-12"><strong>Milli Liters: <span id="water_milliLiters">N/A</span>&nbsp;ml</strong></p>
+        <p class="col-md-12"><strong>Liters per Second: <span id="water_liters_per_second">N/A</span>&nbsp;L/s</strong></p>
+    </div>
+</div>
 </body>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script>
-    var source = new EventSource("/electricity/stream");
-    source.onmessage = function (event) {
+    var electricitySource = new EventSource("/utility/electricity");
+    electricitySource.onmessage = function (event) {
         var obj = JSON.parse(event.data);
         document.getElementById("timestamp").innerHTML = obj.timestamp;
         document.getElementById("watts").innerHTML = obj.watts;
         document.getElementById("amps").innerHTML = obj.amps;
         document.getElementById("wattHours").innerHTML = obj.wattHours;
+        document.getElementById("wattHours").innerHTML = obj.wattHours;
+    };
+    var waterSource = new EventSource("/utility/water");
+    waterSource.onmessage = function (event) {
+        var obj = JSON.parse(event.data);
+        document.getElementById("water_timestamp").innerHTML = obj.timestamp;
+        document.getElementById("water_milliLiters").innerHTML = obj.milliLiters;
+        document.getElementById("water_liters_per_second").innerHTML = obj.litresPerSecond;
     };
 </script>
 </html>
