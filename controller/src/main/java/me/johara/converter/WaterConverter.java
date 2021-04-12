@@ -29,47 +29,47 @@ public class WaterConverter implements UtilityConverter {
     public void registerMetrics(MeterRegistry registry) {
         registry.gauge("water.current.flowRate", this,
                 WaterConverter::flowrate);
-        registry.gauge("water.current.millilitres", this,
+        registry.gauge("water.current.milliLitres", this,
                 WaterConverter::currentMilliLitres);
     }
 
-    public static final int V_RMS = 240;
-    private long lastTimestamp = 0;
+    private AtomicLong lastTimestamp = new AtomicLong(0);
+    private static final Double ONE_LITRE_PER_MIN_MS_DELTA = 60_000d / 450d;
+    private static final Double ML_PER_PULSE = 1_000d / 450d;
 
     private AtomicLong flowrate = new AtomicLong(0);
-    private AtomicLong millilitres = new AtomicLong(0);
-
+    private AtomicLong pulses = new AtomicLong(0);
 
     public void process(UtilityTimestamp utilityTimestamp) {
 
         try {
             Long curTimestamp = utilityTimestamp.getTimestamp();
 
-            logger.infof("Water: Received timestamp: %s", curTimestamp);
+            logger.debugf("Water: Received timestamp: %s", curTimestamp);
 
-            if (lastTimestamp == 0) {
-                lastTimestamp = curTimestamp;
+            //first pulse
+            if (lastTimestamp.get() == 0) {
+                lastTimestamp.set(curTimestamp);
                 return;
             }
 
-            millilitres.incrementAndGet();
-            logger.debugf("Water: Received timestamp: %s", curTimestamp);
+            pulses.incrementAndGet();
 
-            double diff = Double.valueOf(curTimestamp - lastTimestamp);
+            double diff = Double.valueOf(curTimestamp - lastTimestamp.get());
 
             logger.debugf("Water: Duration since previous timestamp: %s", diff);
 
-            lastTimestamp = curTimestamp;
+            lastTimestamp.set(curTimestamp);
 
-            double litresPerSecond = 460 / diff;
+            double litresPerMinute = ONE_LITRE_PER_MIN_MS_DELTA / diff;
 
+            logger.debugf("Water: Average Litres per Minute: %s", litresPerMinute);
 
-            logger.debugf("Water: Average Litres per Second: %s", litresPerSecond);
+            this.flowrate.set(Double.doubleToLongBits(litresPerMinute));
 
-            this.flowrate.set((long) litresPerSecond);
+            waterEmitter.send(new WaterDTO(curTimestamp, getMilliLiters(), litresPerMinute));
 
-            waterEmitter.send(new WaterDTO(curTimestamp, millilitres.get(), litresPerSecond));
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.errorf("An error occured: %s", e.getMessage());
 //            e.printStackTrace();
         }
@@ -81,13 +81,19 @@ public class WaterConverter implements UtilityConverter {
     }
 
 
-    double flowrate(){
-        return flowrate.get();
+    double flowrate() {
+        return Double.longBitsToDouble(flowrate.get());
     }
 
-    double currentMilliLitres(){
-        return ((double) millilitres.get());
+    double currentMilliLitres() {
+        Double curMl = getMilliLiters();
+        //Double curMl = (Double.valueOf(pulses.get()));
+        pulses.set(0);
+        return curMl;
     }
 
+    double getMilliLiters() {
+        return (Double.valueOf(pulses.get()) * ML_PER_PULSE);
+    }
 }
 

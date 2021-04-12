@@ -2,7 +2,7 @@ package me.johara.dto;
 
 public class WaterDTO {
 
-    public long milliLiters;
+    public double milliLiters;
 
     public long timestamp;
 
@@ -13,7 +13,7 @@ public class WaterDTO {
 
     }
 
-    public WaterDTO(long timestamp, long milliLiters, double litresPerSecond) {
+    public WaterDTO(long timestamp, double milliLiters, double litresPerSecond) {
         this.timestamp = timestamp;
         this.milliLiters = milliLiters;
         this.litresPerSecond = litresPerSecond;

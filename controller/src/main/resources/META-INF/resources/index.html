@@ -28,7 +28,7 @@
         <p class="col-md-12">The average water usage in the last period was;</p>
         <p class="col-md-12"><strong>Timestamp: <span id="water_timestamp">N/A</span></strong></p>
         <p class="col-md-12"><strong>Milli Liters: <span id="water_milliLiters">N/A</span>&nbsp;ml</strong></p>
-        <p class="col-md-12"><strong>Liters per Second: <span id="water_liters_per_second">N/A</span>&nbsp;L/s</strong></p>
+        <p class="col-md-12"><strong>Liters per Second: <span id="water_liters_per_minute">N/A</span>&nbsp;L/min</strong></p>
     </div>
 </div>
 </body>
@@ -48,7 +48,7 @@
         var obj = JSON.parse(event.data);
         document.getElementById("water_timestamp").innerHTML = obj.timestamp;
         document.getElementById("water_milliLiters").innerHTML = obj.milliLiters;
-        document.getElementById("water_liters_per_second").innerHTML = obj.litresPerSecond;
+        document.getElementById("water_liters_per_minute").innerHTML = obj.litresPerSecond;
     };
 </script>
 </html>
